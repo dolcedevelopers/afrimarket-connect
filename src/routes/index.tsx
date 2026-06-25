@@ -233,6 +233,31 @@ function LandingPage() {
         )}
       </section>
 
+      {/* Lifestyle gallery */}
+      <section className="border-t border-border bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+          <div className="max-w-2xl mb-12">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-primary">In the wild</span>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight">Made in Africa. Worn everywhere.</h2>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              "https://images.unsplash.com/photo-1604881991720-f91add269bed?auto=format&fit=crop&w=900&q=85",
+              "https://images.unsplash.com/photo-1567361808960-dec9cb578182?auto=format&fit=crop&w=900&q=85",
+              "https://images.unsplash.com/photo-1591375275624-c0d486a3933e?auto=format&fit=crop&w=900&q=85",
+              "https://images.unsplash.com/photo-1611174340580-30c8a08e0d20?auto=format&fit=crop&w=900&q=85",
+            ].map((src, i) => (
+              <div
+                key={src}
+                className={`overflow-hidden rounded-sm bg-stone-100 ${i % 2 === 0 ? "aspect-[3/4]" : "aspect-[3/4] lg:translate-y-8"}`}
+              >
+                <img src={src} alt="" loading="lazy" className="size-full object-cover hover:scale-105 transition-transform duration-700" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="bg-foreground text-white py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 grid md:grid-cols-2 gap-12 items-center">
