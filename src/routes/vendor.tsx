@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { LayoutDashboard, Package, LogOut } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
-import { useAuth } from "@/lib/use-auth";
+import { useAuth, isAdmin, isVendor } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/vendor")({
@@ -12,16 +12,22 @@ export const Route = createFileRoute("/vendor")({
 });
 
 function VendorLayout() {
-  const { user, loading } = useAuth();
+  const { user, loading, rolesLoading, roles } = useAuth();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const admin = isAdmin(roles);
 
   useEffect(() => {
-    if (!loading && !user)
-      navigate({ to: "/auth", search: { redirect: "/vendor" }, replace: true });
+    if (!loading && !user) navigate({ to: "/auth", search: { redirect: "/vendor" }, replace: true });
   }, [loading, user, navigate]);
 
-  if (loading || !user) {
+  useEffect(() => {
+    if (!loading && !rolesLoading && user && !isVendor(roles)) {
+      navigate({ to: "/products", replace: true });
+    }
+  }, [loading, rolesLoading, user, roles, navigate]);
+
+  if (loading || rolesLoading || !user || !isVendor(roles)) {
     return (
       <div className="min-h-screen grid place-items-center text-xs font-mono uppercase tracking-widest text-muted-foreground">
         Loading...
@@ -35,23 +41,11 @@ function VendorLayout() {
       <div className="mx-auto max-w-7xl grid lg:grid-cols-[240px_1fr] gap-0 px-4 sm:px-6">
         <aside className="lg:border-r border-border lg:py-12 lg:pr-6">
           <div className="lg:sticky lg:top-24">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              Console
-            </span>
-            <h2 className="text-xl font-bold mt-1 mb-6">Vendor</h2>
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Console</span>
+            <h2 className="text-xl font-bold mt-1 mb-6">{admin ? "Admin" : "Vendor"}</h2>
             <nav className="flex lg:flex-col gap-1 overflow-x-auto pb-2 lg:pb-0">
-              <NavItem
-                to="/vendor"
-                active={path === "/vendor"}
-                icon={LayoutDashboard}
-                label="Dashboard"
-              />
-              <NavItem
-                to="/vendor/products"
-                active={path.startsWith("/vendor/products")}
-                icon={Package}
-                label="Products"
-              />
+              <NavItem to="/vendor" active={path === "/vendor"} icon={LayoutDashboard} label="Dashboard" />
+              <NavItem to="/vendor/products" active={path.startsWith("/vendor/products")} icon={Package} label="Products" />
               <button
                 onClick={async () => {
                   await supabase.auth.signOut();
@@ -88,9 +82,7 @@ function NavItem({
     <Link
       to={to}
       className={`flex items-center gap-3 px-3 py-2 text-sm whitespace-nowrap border-l-2 ${
-        active
-          ? "border-primary bg-primary/5 text-primary font-semibold"
-          : "border-transparent hover:bg-stone-100"
+        active ? "border-primary bg-primary/5 text-primary font-semibold" : "border-transparent hover:bg-stone-100"
       }`}
     >
       <Icon className="size-4" />

@@ -18,36 +18,21 @@ export function AppHeader() {
             Afri<span className="text-primary">Market</span>
           </Link>
           <div className="hidden md:flex gap-6">
-            <Link
-              to="/products"
-              className="text-sm font-medium hover:text-primary transition-colors"
-              activeProps={{ className: "text-primary" }}
-            >
+            <Link to="/products" className="text-sm font-medium hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>
               Marketplace
             </Link>
-            <Link
-              to="/products"
-              search={{ category: undefined }}
-              className="text-sm font-medium hover:text-primary transition-colors"
-            >
-              Categories
+            <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>
+              About Us
             </Link>
             {user && isVendor(roles) ? (
-              <Link
-                to="/vendor"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
+              <Link to="/vendor" className="text-sm font-medium hover:text-primary transition-colors">
                 Dashboard
               </Link>
             ) : null}
           </div>
         </div>
         <div className="hidden md:flex items-center gap-3">
-          <Link
-            to="/cart"
-            className="relative p-2 hover:text-primary transition-colors"
-            aria-label="Cart"
-          >
+          <Link to="/cart" className="relative p-2 hover:text-primary transition-colors" aria-label="Cart">
             <ShoppingBag className="size-5" />
             {count > 0 ? (
               <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold size-4 grid place-items-center rounded-full font-mono">
@@ -56,25 +41,21 @@ export function AppHeader() {
             ) : null}
           </Link>
           {user ? (
-            <Link
-              to="/vendor"
-              className="bg-foreground text-white px-5 py-2 text-sm font-semibold rounded-full hover:bg-foreground/90 transition-all"
-            >
-              Account
-            </Link>
+            isVendor(roles) ? (
+              <Link to="/vendor" className="bg-foreground text-white px-5 py-2 text-sm font-semibold rounded-full hover:bg-foreground/90 transition-all">
+                Account
+              </Link>
+            ) : (
+              <Link to="/products" className="bg-foreground text-white px-5 py-2 text-sm font-semibold rounded-full hover:bg-foreground/90 transition-all">
+                Account
+              </Link>
+            )
           ) : (
             <>
-              <Link
-                to="/auth"
-                className="text-sm font-semibold text-primary px-4 py-2 hover:bg-primary/5 transition-colors rounded-full"
-              >
+              <Link to="/auth" className="text-sm font-semibold text-primary px-4 py-2 hover:bg-primary/5 transition-colors rounded-full">
                 Log in
               </Link>
-              <Link
-                to="/auth"
-                search={{ mode: "signup", role: "vendor" }}
-                className="bg-foreground text-white px-5 py-2 text-sm font-semibold rounded-full hover:bg-foreground/90 transition-all"
-              >
+              <Link to="/auth" search={{ mode: "signup", role: "vendor" }} className="bg-foreground text-white px-5 py-2 text-sm font-semibold rounded-full hover:bg-foreground/90 transition-all">
                 Become a Vendor
               </Link>
             </>
@@ -91,27 +72,19 @@ export function AppHeader() {
       </div>
       {open ? (
         <div className="md:hidden border-t border-border bg-white px-4 py-4 flex flex-col gap-3">
-          <Link to="/products" onClick={() => setOpen(false)} className="text-sm font-medium py-2">
-            Marketplace
-          </Link>
-          <Link to="/cart" onClick={() => setOpen(false)} className="text-sm font-medium py-2">
-            Cart ({count})
-          </Link>
+          <Link to="/products" onClick={() => setOpen(false)} className="text-sm font-medium py-2">Marketplace</Link>
+          <Link to="/about" onClick={() => setOpen(false)} className="text-sm font-medium py-2">About Us</Link>
+          <Link to="/cart" onClick={() => setOpen(false)} className="text-sm font-medium py-2">Cart ({count})</Link>
           {user ? (
-            <Link to="/vendor" onClick={() => setOpen(false)} className="text-sm font-medium py-2">
-              Dashboard
-            </Link>
+            isVendor(roles) ? (
+              <Link to="/vendor" onClick={() => setOpen(false)} className="text-sm font-medium py-2">Dashboard</Link>
+            ) : (
+              <Link to="/products" onClick={() => setOpen(false)} className="text-sm font-medium py-2">Account</Link>
+            )
           ) : (
             <>
-              <Link to="/auth" onClick={() => setOpen(false)} className="text-sm font-medium py-2">
-                Log in
-              </Link>
-              <Link
-                to="/auth"
-                search={{ mode: "signup", role: "vendor" }}
-                onClick={() => setOpen(false)}
-                className="bg-foreground text-white px-5 py-2.5 text-sm font-semibold rounded-full text-center"
-              >
+              <Link to="/auth" onClick={() => setOpen(false)} className="text-sm font-medium py-2">Log in</Link>
+              <Link to="/auth" search={{ mode: "signup", role: "vendor" }} onClick={() => setOpen(false)} className="bg-foreground text-white px-5 py-2.5 text-sm font-semibold rounded-full text-center">
                 Become a Vendor
               </Link>
             </>

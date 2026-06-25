@@ -10,32 +10,16 @@ export function SiteFooter() {
               Afri<span className="text-primary">Market</span>
             </span>
             <p className="text-sm text-muted-foreground max-w-xs">
-              The platform for the next generation of African commerce. High-trust, low-friction,
-              global reach.
+              The platform for the next generation of African commerce. High-trust, low-friction, global reach.
             </p>
           </div>
           <div>
             <h4 className="text-xs font-bold uppercase tracking-widest mb-6">Platform</h4>
             <ul className="space-y-4 text-sm text-muted-foreground">
-              <li>
-                <Link to="/products" className="hover:text-primary">
-                  Marketplace
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/auth"
-                  search={{ mode: "signup", role: "vendor" }}
-                  className="hover:text-primary"
-                >
-                  Become a Vendor
-                </Link>
-              </li>
-              <li>
-                <Link to="/cart" className="hover:text-primary">
-                  Cart
-                </Link>
-              </li>
+              <li><Link to="/products" className="hover:text-primary">Marketplace</Link></li>
+              <li><Link to="/about" className="hover:text-primary">About Us</Link></li>
+              <li><Link to="/auth" search={{ mode: "signup", role: "vendor" }} className="hover:text-primary">Become a Vendor</Link></li>
+              <li><Link to="/cart" className="hover:text-primary">Cart</Link></li>
             </ul>
           </div>
           <div>

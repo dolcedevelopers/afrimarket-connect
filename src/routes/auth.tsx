@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppHeader } from "@/components/app-header";
 import { SiteFooter } from "@/components/site-footer";
+import { defaultRouteForRoles } from "@/lib/use-auth";
 
 const SearchSchema = z.object({
   mode: z.enum(["signin", "signup"]).optional(),
@@ -17,11 +18,7 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in to AfriMarket" },
-      {
-        name: "description",
-        content:
-          "Sign in or create an AfriMarket account to buy from verified African vendors or start selling.",
-      },
+      { name: "description", content: "Sign in or create an AfriMarket account to buy from verified African vendors or start selling." },
     ],
   }),
   component: AuthPage,
@@ -39,10 +36,17 @@ function AuthPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: search.redirect ?? "/vendor", replace: true });
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const { data: roleRows } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id);
+      const roles = roleRows?.map((r) => r.role) ?? [];
+      const fallback = defaultRouteForRoles(roles);
+      navigate({ to: search.redirect ?? fallback, replace: true });
     });
-  }, [navigate, search.redirect]);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -61,17 +65,18 @@ function AuthPage() {
         toast.success("Account created. Welcome to AfriMarket.");
         navigate({ to: role === "vendor" ? "/vendor" : "/products", replace: true });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        const { data: roleRows } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.user!.id);
+        const roles = roleRows?.map((r) => r.role) ?? [];
         toast.success("Welcome back.");
-        navigate({ to: search.redirect ?? "/vendor", replace: true });
+        navigate({ to: search.redirect ?? defaultRouteForRoles(roles), replace: true });
       }
     } catch (err) {
-      toast.error(
-        mode === "signup"
-          ? "We could not create your account. Please check your details."
-          : "We could not sign you in. Please check your details.",
-      );
+      toast.error(err instanceof Error ? err.message : "Authentication failed");
     } finally {
       setSubmitting(false);
     }
@@ -135,23 +140,8 @@ function AuthPage() {
                 ) : null}
               </>
             ) : null}
-            <Field
-              label="Email"
-              type="email"
-              value={email}
-              onChange={setEmail}
-              required
-              maxLength={255}
-            />
-            <Field
-              label="Password"
-              type="password"
-              value={password}
-              onChange={setPassword}
-              required
-              minLength={8}
-              maxLength={72}
-            />
+            <Field label="Email" type="email" value={email} onChange={setEmail} required maxLength={255} />
+            <Field label="Password" type="password" value={password} onChange={setPassword} required minLength={8} maxLength={72} />
 
             <button
               type="submit"
@@ -198,9 +188,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-        {label}
-      </span>
+      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{label}</span>
       <input
         type={type}
         value={value}
